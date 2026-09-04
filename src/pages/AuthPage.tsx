@@ -368,10 +368,20 @@ export const AuthPage: React.FC<AuthPageProps> = ({ onLogin }) => {
           </>
         )}
 
-        {/* Security badge */}
-        <div className="mt-6 pt-4 border-t border-white/5 flex items-center justify-center gap-1.5 text-[11px] text-zinc-500">
-          <Shield className="w-3.5 h-3.5 text-emerald-400" />
-          <span>Connected to Firebase Authentication</span>
+        {/* Security badge & Privacy Policy */}
+        <div className="mt-6 pt-4 border-t border-white/5 flex flex-col items-center justify-center gap-2 text-[11px] text-zinc-500">
+          <div className="flex items-center gap-1.5">
+            <Shield className="w-3.5 h-3.5 text-emerald-400" />
+            <span>Connected to Firebase Authentication</span>
+          </div>
+          <a
+            href="./privacy-policy.html"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-zinc-400 hover:text-[#25D366] transition-colors underline"
+          >
+            Privacy Policy
+          </a>
         </div>
 
       </div>

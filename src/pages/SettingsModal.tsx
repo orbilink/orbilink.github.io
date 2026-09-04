@@ -402,9 +402,19 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   <p className="text-xs text-neutral-400 leading-relaxed">
                     ORBILINK is a complete, real-time messaging application powered by Firebase Authentication, Cloud Firestore, Firebase Cloud Storage, and WebRTC audio/video calling.
                   </p>
-                  <div className="pt-2 flex items-center gap-2 text-[11px] text-emerald-400">
-                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                    <span>Version 1.0.0 • Connected</span>
+                  <div className="pt-2 flex items-center justify-between text-[11px]">
+                    <div className="flex items-center gap-2 text-emerald-400">
+                      <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                      <span>Version 1.0.0 • Connected</span>
+                    </div>
+                    <a
+                      href="./privacy-policy.html"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-neutral-400 hover:text-emerald-400 underline transition-colors"
+                    >
+                      Privacy Policy
+                    </a>
                   </div>
                 </div>
               </div>

@@ -37,6 +37,7 @@ export interface Message {
   type: 'text' | 'voice' | 'image' | 'file' | 'system' | 'ai';
   voiceDuration?: number; // in seconds
   voiceWaveform?: number[];
+  mediaUrl?: string;
   attachments?: Attachment[];
   reactions?: Reaction[];
   replyTo?: {
@@ -70,7 +71,7 @@ export interface GoogleContact {
   email: string;
   phone?: string;
   photoUrl?: string;
-  isRynoxUser?: boolean;
+  isOrbilinkUser?: boolean;
 }
 
 export interface GoogleDriveFile {

@@ -532,7 +532,7 @@ export const GmailView: React.FC<GmailViewProps> = ({
                       <button
                         onClick={() => setSelectedEmailForShare(selectedMessage)}
                         className="px-2.5 py-1.5 rounded-xl bg-neutral-900 hover:bg-neutral-800 text-neutral-200 border border-neutral-800 text-xs font-semibold flex items-center gap-1 transition-colors"
-                        title="Share to RYNOX Chat"
+                        title="Share to ORBILINK Chat"
                       >
                         <Share2 className="w-3.5 h-3.5 text-emerald-400" />
                         <span className="hidden sm:inline">Share</span>
@@ -728,7 +728,7 @@ export const GmailView: React.FC<GmailViewProps> = ({
         </div>
       )}
 
-      {/* Share Email to RYNOX Chat Modal */}
+      {/* Share Email to ORBILINK Chat Modal */}
       {selectedEmailForShare && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="w-full max-w-md bg-neutral-900 border border-neutral-800 rounded-3xl p-5 shadow-2xl space-y-4">

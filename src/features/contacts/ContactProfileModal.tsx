@@ -86,7 +86,7 @@ export const ContactProfileModal: React.FC<ContactProfileModalProps> = ({
             <span className="text-neutral-500 uppercase tracking-wider text-[10px] font-bold block mb-1">
               About
             </span>
-            <p className="text-neutral-200 leading-relaxed">{contact.about || 'RYNOX verified account'}</p>
+            <p className="text-neutral-200 leading-relaxed">{contact.about || 'ORBILINK verified account'}</p>
           </div>
 
           <div className="h-px bg-neutral-800" />

@@ -1,7 +1,7 @@
 import firebaseAppletConfig from '../../firebase-applet-config.json';
 
 /**
- * Firebase Configuration for RYNOX
+ * Firebase Configuration for ORBILINK
  * 
  * Required Environment Variables (Vite Client):
  * - VITE_FIREBASE_API_KEY

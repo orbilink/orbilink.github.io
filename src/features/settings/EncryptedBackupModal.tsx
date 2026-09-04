@@ -114,7 +114,7 @@ export const EncryptedBackupModal: React.FC<EncryptedBackupModalProps> = ({
       return;
     }
     if (!acknowledgedWarning) {
-      setBackupError('Please acknowledge that RYNOX cannot recover lost passphrases.');
+      setBackupError('Please acknowledge that ORBILINK cannot recover lost passphrases.');
       return;
     }
 
@@ -269,13 +269,13 @@ export const EncryptedBackupModal: React.FC<EncryptedBackupModalProps> = ({
       const a = document.createElement('a');
       if (backup.downloadUrl) {
         a.href = backup.downloadUrl;
-        a.download = `rynox_encrypted_backup_${backup.backupId}.enc`;
+        a.download = `orbilink_encrypted_backup_${backup.backupId}.enc`;
         a.target = '_blank';
         a.click();
       } else if (blob) {
         const url = URL.createObjectURL(blob);
         a.href = url;
-        a.download = `rynox_backup_${backup.backupId}.rybox-enc`;
+        a.download = `orbilink_backup_${backup.backupId}.orbilink-enc`;
         a.click();
         URL.revokeObjectURL(url);
       }
@@ -331,7 +331,7 @@ export const EncryptedBackupModal: React.FC<EncryptedBackupModalProps> = ({
         <div className="px-5 py-3 bg-neutral-950/80 border-b border-neutral-800/80 flex items-start gap-2.5 text-xs text-neutral-400">
           <Lock className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
           <p className="leading-relaxed text-[11px]">
-            Backups are encrypted on your device before upload. RYNOX does not receive the backup decryption secret and cannot decrypt your data.
+            Backups are encrypted on your device before upload. ORBILINK does not receive the backup decryption secret and cannot decrypt your data.
           </p>
         </div>
 
@@ -610,7 +610,7 @@ export const EncryptedBackupModal: React.FC<EncryptedBackupModalProps> = ({
                   <span>Choose a Recovery Secret</span>
                 </div>
                 <p className="text-[11px] text-neutral-400 leading-relaxed">
-                  Your recovery secret derives the 256-bit AES-GCM encryption key locally. It is NEVER transmitted or stored on RYNOX servers.
+                  Your recovery secret derives the 256-bit AES-GCM encryption key locally. It is NEVER transmitted or stored on ORBILINK servers.
                 </p>
               </div>
 
@@ -660,7 +660,7 @@ export const EncryptedBackupModal: React.FC<EncryptedBackupModalProps> = ({
                     className="w-4 h-4 rounded text-amber-500 bg-neutral-900 border-neutral-700 mt-0.5 flex-shrink-0"
                   />
                   <label htmlFor="ack-warning" className="text-[11px] text-amber-300/90 leading-tight select-none cursor-pointer">
-                    I understand that my recovery secret is required to restore this backup. RYNOX cannot decrypt or recover it for me if lost.
+                    I understand that my recovery secret is required to restore this backup. ORBILINK cannot decrypt or recover it for me if lost.
                   </label>
                 </div>
 

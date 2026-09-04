@@ -51,7 +51,7 @@ export const MessageItem: React.FC<MessageItemProps> = ({
             {message.senderName}
           </span>
           {message.isAiGenerated && (
-            <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-medium bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+            <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-medium bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
               <Sparkles className="w-2.5 h-2.5" /> AI
             </span>
           )}
@@ -65,7 +65,7 @@ export const MessageItem: React.FC<MessageItemProps> = ({
           <div
             className={`text-xs px-3 py-1.5 mb-1 rounded-lg border-l-2 ${
               isMe
-                ? 'bg-indigo-950/40 border-indigo-400 text-indigo-200'
+                ? 'bg-emerald-950/50 border-emerald-400 text-emerald-200'
                 : 'bg-zinc-800/80 border-zinc-500 text-zinc-300'
             }`}
           >
@@ -78,10 +78,10 @@ export const MessageItem: React.FC<MessageItemProps> = ({
         <div
           className={`rounded-2xl px-4 py-3 shadow-md ${
             isMe
-              ? 'bg-indigo-600 text-white rounded-tr-sm shadow-indigo-950/30'
+              ? 'bg-[#005C4B] text-white rounded-tr-sm shadow-black/20'
               : message.isAiGenerated
-              ? 'bg-gradient-to-b from-zinc-900 to-zinc-900/90 border border-indigo-500/30 text-zinc-100 rounded-tl-sm'
-              : 'bg-zinc-800/90 border border-zinc-700/50 text-zinc-100 rounded-tl-sm'
+              ? 'bg-gradient-to-b from-zinc-900 to-zinc-900/90 border border-emerald-500/30 text-zinc-100 rounded-tl-sm'
+              : 'bg-[#202C33] border border-white/5 text-zinc-100 rounded-tl-sm'
           }`}
         >
           {/* Voice Type */}
@@ -91,8 +91,8 @@ export const MessageItem: React.FC<MessageItemProps> = ({
                 onClick={toggleVoicePlayback}
                 className={`p-2.5 rounded-full flex items-center justify-center transition-colors ${
                   isMe
-                    ? 'bg-white text-indigo-700 hover:bg-zinc-100'
-                    : 'bg-indigo-600 text-white hover:bg-indigo-500'
+                    ? 'bg-white text-emerald-800 hover:bg-zinc-100'
+                    : 'bg-[#25D366] text-black hover:bg-[#1ebd5d]'
                 }`}
               >
                 {isPlayingVoice ? <Pause className="w-4 h-4 fill-current" /> : <Play className="w-4 h-4 fill-current ml-0.5" />}
@@ -103,7 +103,7 @@ export const MessageItem: React.FC<MessageItemProps> = ({
                     <div
                       key={i}
                       className={`w-1 rounded-full transition-all duration-150 ${
-                        isPlayingVoice ? 'bg-indigo-300 animate-pulse' : isMe ? 'bg-white/60' : 'bg-indigo-400/60'
+                        isPlayingVoice ? 'bg-emerald-300 animate-pulse' : isMe ? 'bg-white/60' : 'bg-emerald-400/60'
                       }`}
                       style={{ height: `${Math.max(6, (h / 100) * 22)}px` }}
                     />
@@ -129,7 +129,7 @@ export const MessageItem: React.FC<MessageItemProps> = ({
                   key={att.id}
                   className="flex items-center gap-2.5 p-2 rounded-xl bg-black/20 border border-white/10 text-xs"
                 >
-                  <div className="p-1.5 bg-indigo-500/20 text-indigo-300 rounded-lg">
+                  <div className="p-1.5 bg-emerald-500/20 text-emerald-300 rounded-lg">
                     📎
                   </div>
                   <div className="flex-1 min-w-0">
@@ -144,7 +144,7 @@ export const MessageItem: React.FC<MessageItemProps> = ({
           {/* Footer: Timestamp & status */}
           <div
             className={`flex items-center justify-end gap-1.5 mt-1 text-[10px] ${
-              isMe ? 'text-indigo-200' : 'text-zinc-400'
+              isMe ? 'text-emerald-200' : 'text-zinc-400'
             }`}
           >
             <span>{formatTimestamp(message.timestamp)}</span>
@@ -153,7 +153,7 @@ export const MessageItem: React.FC<MessageItemProps> = ({
                 {message.status === 'read' ? (
                   <CheckCheck className="w-3.5 h-3.5 text-cyan-300" />
                 ) : (
-                  <Check className="w-3.5 h-3.5" />
+                  <Check className="w-3.5 h-3.5 text-emerald-200" />
                 )}
               </span>
             )}
@@ -167,7 +167,7 @@ export const MessageItem: React.FC<MessageItemProps> = ({
               <button
                 key={i}
                 onClick={() => onReact(message.id, r.emoji)}
-                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs bg-zinc-900 border border-zinc-700 text-zinc-300 hover:border-indigo-500 transition-colors"
+                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs bg-zinc-900 border border-zinc-700 text-zinc-300 hover:border-emerald-500 transition-colors"
               >
                 <span>{r.emoji}</span>
                 <span className="font-semibold text-[10px]">{r.count}</span>

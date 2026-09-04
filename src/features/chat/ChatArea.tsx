@@ -7,12 +7,14 @@ import {
   Phone,
   Info,
   X,
-  Bot
+  Bot,
+  AlertCircle
 } from 'lucide-react';
 import { ChatGroup, Message, User } from '../../types';
 import { MessageItem } from './MessageItem';
 import { AudioRecorder } from './AudioRecorder';
-import { askGeminiAssistant, generateSmartReplies } from '../../services/geminiService';
+import { askGeminiAssistant, generateSmartReplies, checkGeminiStatus } from '../../services/geminiService';
+import { storageService } from '../../services/firebase/storageService';
 
 interface ChatAreaProps {
   chat: ChatGroup;
@@ -38,30 +40,40 @@ export const ChatArea: React.FC<ChatAreaProps> = ({
   const [replyTarget, setReplyTarget] = useState<Message | null>(null);
   const [smartReplies, setSmartReplies] = useState<string[]>([]);
   const [isAiTyping, setIsAiTyping] = useState(false);
+  const [isAiConfigured, setIsAiConfigured] = useState<boolean | null>(null);
+  const [aiError, setAiError] = useState<string | null>(null);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    checkGeminiStatus().then((status) => {
+      setIsAiConfigured(status);
+    });
+  }, []);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isAiTyping]);
 
   useEffect(() => {
-    // Generate smart reply pills if last message is from someone else
-    if (messages.length > 0) {
+    if (messages.length > 0 && isAiConfigured) {
       const last = messages[messages.length - 1];
       if (last.senderId !== currentUser.id && last.type === 'text') {
         generateSmartReplies(last.content).then(setSmartReplies);
       } else {
         setSmartReplies([]);
       }
+    } else {
+      setSmartReplies([]);
     }
-  }, [messages, currentUser.id]);
+  }, [messages, currentUser.id, isAiConfigured]);
 
   const handleSend = async () => {
     if (!inputText.trim()) return;
 
     const textToSend = inputText;
     setInputText('');
+    setAiError(null);
 
     const extra: Partial<Message> = {};
     if (replyTarget) {
@@ -75,44 +87,61 @@ export const ChatArea: React.FC<ChatAreaProps> = ({
 
     onSendMessage(textToSend, 'text', extra);
 
-    // If chatting in AI Assistant channel, trigger Gemini assistant response
+    // If chatting in AI Assistant channel, trigger Gemini assistant response if configured
     if (chat.type === 'ai') {
+      if (isAiConfigured === false) {
+        setAiError('Google GenAI backend is not configured on the server.');
+        return;
+      }
       setIsAiTyping(true);
       try {
         const response = await askGeminiAssistant(textToSend, messages);
         setIsAiTyping(false);
         onSendMessage(response.text, 'ai', {
           senderId: 'usr_ai',
-          senderName: 'RYNOX Intelligence',
+          senderName: 'ORBILINK AI',
           senderAvatar: chat.avatarUrl,
           isAiGenerated: true
         });
-        if (response.suggestedReplies) {
+        if (response.suggestedReplies && response.suggestedReplies.length > 0) {
           setSmartReplies(response.suggestedReplies);
         }
-      } catch {
+      } catch (err: any) {
         setIsAiTyping(false);
+        setAiError(err?.message || 'Google GenAI backend is not configured');
       }
     }
   };
 
-  const handleSendVoice = (durationSec: number, waveform: number[]) => {
+  const handleSendVoice = async (durationSec: number, waveform: number[], audioBlob?: Blob) => {
     setIsRecordingVoice(false);
-    onSendMessage('Voice Note', 'voice', {
+    let mediaUrl: string | undefined = undefined;
+
+    if (audioBlob && storageService.isStorageConfigured()) {
+      try {
+        const uploadResult = await storageService.uploadChatMedia(
+          chat.id,
+          audioBlob,
+          `voice_${Date.now()}.webm`
+        );
+        mediaUrl = uploadResult.downloadUrl;
+      } catch (uploadErr) {
+        console.warn('[ORBILINK] Voice note media upload fallback:', uploadErr);
+      }
+    }
+
+    onSendMessage(`Voice message (${durationSec}s)`, 'voice', {
       voiceDuration: durationSec,
-      voiceWaveform: waveform
+      voiceWaveform: waveform,
+      mediaUrl
     });
   };
 
-  const handleReact = (msgId: string, emoji: string) => {
-    // Local mock reaction toggler
-    const msg = messages.find((m) => m.id === msgId);
-    if (!msg) return;
-
+  const handleReact = (msg: Message, emoji: string) => {
     const existingReactions = msg.reactions || [];
     const found = existingReactions.find((r) => r.emoji === emoji);
 
-    let updated;
+    let updated = [];
     if (found) {
       if (found.users.includes(currentUser.id)) {
         updated = existingReactions
@@ -149,7 +178,7 @@ export const ChatArea: React.FC<ChatAreaProps> = ({
               className="w-10 h-10 rounded-full object-cover border border-white/10"
             />
             {chat.type === 'ai' && (
-              <div className="absolute -bottom-0.5 -right-0.5 p-0.5 rounded-full bg-indigo-600 text-white">
+              <div className="absolute -bottom-0.5 -right-0.5 p-0.5 rounded-full bg-[#25D366] text-black">
                 <Sparkles className="w-2.5 h-2.5" />
               </div>
             )}
@@ -160,7 +189,9 @@ export const ChatArea: React.FC<ChatAreaProps> = ({
             </h2>
             <p className="text-xs text-zinc-400 truncate">
               {chat.type === 'ai'
-                ? 'Gemini 2.5 • Instant Reasoning & Live Voice'
+                ? isAiConfigured
+                  ? 'Gemini 2.5 • Instant Reasoning & Live Voice'
+                  : 'Google GenAI backend is not configured'
                 : chat.type === 'group'
                 ? `${chat.participants.length} members`
                 : 'Active now'}
@@ -170,54 +201,89 @@ export const ChatArea: React.FC<ChatAreaProps> = ({
 
         {/* Header Action Buttons */}
         <div className="flex items-center gap-2">
-          <button
-            onClick={onOpenLiveVoice}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-600/20 hover:bg-indigo-600/30 border border-indigo-500/30 text-indigo-300 hover:text-indigo-200 text-xs font-semibold transition-all duration-150 shadow-sm"
-            title="Start Gemini Live Voice Session"
-          >
-            <Phone className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Live Voice</span>
-          </button>
+          {chat.type === 'ai' ? (
+            <button
+              onClick={isAiConfigured ? onOpenLiveVoice : undefined}
+              disabled={!isAiConfigured}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#25D366]/20 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-[#25D366]/30 border border-[#25D366]/30 text-[#25D366] hover:text-emerald-300 text-xs font-semibold transition-all duration-150 shadow-sm"
+              title={isAiConfigured ? 'Start Gemini Live Voice Session' : 'AI not configured'}
+            >
+              <Phone className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Live Voice</span>
+            </button>
+          ) : (
+            <button
+              disabled
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-zinc-800/60 border border-white/5 text-zinc-500 text-xs font-semibold cursor-not-allowed opacity-60"
+              title="Calls disabled (Requires real two-device WebRTC testing)"
+            >
+              <Phone className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Call (Disabled)</span>
+            </button>
+          )}
 
-          <button
-            onClick={onOpenGroupInfo}
-            className="p-2 text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/80 rounded-xl transition-colors"
-            title="Chat info & settings"
-          >
-            <Info className="w-4 h-4" />
-          </button>
+          {chat.type === 'group' && (
+            <button
+              onClick={onOpenGroupInfo}
+              className="p-2 text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/60 rounded-xl transition-colors"
+              title="Group Information"
+            >
+              <Info className="w-4 h-4" />
+            </button>
+          )}
         </div>
       </div>
 
-      {/* Messages Scroll View */}
-      <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-2">
-        {messages.map((msg) => (
-          <MessageItem
-            key={msg.id}
-            message={msg}
-            isMe={msg.senderId === currentUser.id}
-            onReply={(m) => setReplyTarget(m)}
-            onReact={handleReact}
-          />
-        ))}
+      {/* Messages List Area */}
+      <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
+        {messages.length === 0 ? (
+          <div className="h-full flex flex-col items-center justify-center text-center p-8 text-zinc-500">
+            <div className="w-12 h-12 rounded-2xl bg-zinc-900 border border-white/5 flex items-center justify-center mb-3">
+              <Bot className="w-6 h-6 text-zinc-400" />
+            </div>
+            <h3 className="text-sm font-semibold text-zinc-300 mb-1">No messages in this conversation</h3>
+            <p className="text-xs max-w-xs text-zinc-500">
+              Send a message to start real-time communication.
+            </p>
+          </div>
+        ) : (
+          messages.map((message) => (
+            <MessageItem
+              key={message.id}
+              message={message}
+              isMe={message.senderId === currentUser.id}
+              onReact={(_msgId, emoji) => handleReact(message, emoji)}
+              onReply={() => setReplyTarget(message)}
+            />
+          ))
+        )}
 
         {isAiTyping && (
-          <div className="flex items-center gap-2 text-xs text-indigo-400 font-medium py-2 px-3 bg-indigo-950/20 rounded-xl border border-indigo-500/20 w-fit animate-pulse">
-            <Bot className="w-4 h-4 animate-spin" />
-            <span>RYNOX Intelligence is analyzing...</span>
+          <div className="flex items-center gap-2 text-xs text-zinc-400 italic">
+            <Sparkles className="w-3.5 h-3.5 text-[#25D366] animate-spin" />
+            <span>ORBILINK AI is analyzing and reasoning...</span>
+          </div>
+        )}
+
+        {aiError && (
+          <div className="p-3 rounded-xl bg-rose-950/40 border border-rose-500/20 text-xs text-rose-300 flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 shrink-0 text-rose-400" />
+            <span>{aiError}</span>
           </div>
         )}
 
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Bottom Bar: Smart Replies, Quote & Input Area */}
-      <div className="p-3 sm:p-4 border-t border-white/5 bg-zinc-900/50 backdrop-blur-md space-y-2 shrink-0">
-        {/* Smart Reply Suggestions */}
-        {smartReplies.length > 0 && !isRecordingVoice && (
-          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar">
-            <span className="text-[11px] text-zinc-500 flex items-center gap-1 shrink-0">
-              <Sparkles className="w-3 h-3 text-indigo-400" /> Suggestion:
+      {/* Input Tray */}
+      <div className="p-4 bg-zinc-900/40 border-t border-white/5 space-y-2 shrink-0">
+        
+        {/* Smart Reply Pills (Real Gemini predictions only) */}
+        {smartReplies.length > 0 && (
+          <div className="flex items-center gap-2 overflow-x-auto py-1 scrollbar-none">
+            <span className="text-[11px] text-zinc-500 flex items-center gap-1 shrink-0 font-medium">
+              <Sparkles className="w-3 h-3 text-[#25D366]" />
+              Smart Replies:
             </span>
             {smartReplies.map((reply, i) => (
               <button
@@ -226,7 +292,7 @@ export const ChatArea: React.FC<ChatAreaProps> = ({
                   onSendMessage(reply, 'text');
                   setSmartReplies([]);
                 }}
-                className="px-2.5 py-1 rounded-full text-xs bg-zinc-800/80 hover:bg-zinc-700 text-zinc-300 hover:text-white border border-zinc-700/60 whitespace-nowrap transition-colors"
+                className="px-3 py-1 rounded-full bg-zinc-800/80 hover:bg-[#25D366]/20 text-xs text-zinc-300 hover:text-[#25D366] border border-white/5 hover:border-[#25D366]/30 whitespace-nowrap transition-all duration-150"
               >
                 {reply}
               </button>
@@ -238,7 +304,7 @@ export const ChatArea: React.FC<ChatAreaProps> = ({
         {replyTarget && (
           <div className="flex items-center justify-between px-3 py-1.5 rounded-xl bg-zinc-800/80 border border-zinc-700 text-xs text-zinc-300">
             <div className="truncate">
-              <span className="font-semibold text-indigo-300">Replying to {replyTarget.senderName}: </span>
+              <span className="font-semibold text-[#25D366]">Replying to {replyTarget.senderName}: </span>
               <span className="opacity-80">{replyTarget.content}</span>
             </div>
             <button
@@ -260,7 +326,7 @@ export const ChatArea: React.FC<ChatAreaProps> = ({
           <div className="flex items-center gap-2">
             <button
               onClick={onOpenDrivePicker}
-              className="p-2.5 text-zinc-400 hover:text-indigo-300 hover:bg-zinc-800/80 rounded-xl transition-colors shrink-0"
+              className="p-2.5 text-zinc-400 hover:text-[#25D366] hover:bg-zinc-800/80 rounded-xl transition-colors shrink-0"
               title="Attach from Google Drive"
             >
               <Paperclip className="w-4 h-4" />
@@ -279,17 +345,20 @@ export const ChatArea: React.FC<ChatAreaProps> = ({
                 }}
                 placeholder={
                   chat.type === 'ai'
-                    ? 'Ask Gemini anything or draft a response...'
+                    ? isAiConfigured === false
+                      ? 'AI disabled - Google GenAI backend is not configured'
+                      : 'Ask Gemini anything or draft a response...'
                     : 'Type a message...'
                 }
-                className="w-full bg-zinc-900/90 border border-white/10 focus:border-indigo-500/50 rounded-2xl px-4 py-2.5 text-sm text-zinc-100 placeholder-zinc-500 focus:outline-none transition-all shadow-inner"
+                disabled={chat.type === 'ai' && isAiConfigured === false}
+                className="w-full bg-zinc-900/90 border border-white/10 focus:border-[#25D366]/50 rounded-2xl px-4 py-2.5 text-sm text-zinc-100 placeholder-zinc-500 focus:outline-none transition-all shadow-inner disabled:opacity-50"
               />
             </div>
 
             {inputText.trim() ? (
               <button
                 onClick={handleSend}
-                className="p-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl shadow-md shadow-indigo-500/20 transition-all shrink-0"
+                className="p-2.5 bg-[#25D366] hover:bg-[#128C7E] text-black rounded-xl shadow-md shadow-[#25D366]/20 transition-all shrink-0 font-bold"
                 title="Send message"
               >
                 <Send className="w-4 h-4" />
@@ -297,7 +366,7 @@ export const ChatArea: React.FC<ChatAreaProps> = ({
             ) : (
               <button
                 onClick={() => setIsRecordingVoice(true)}
-                className="p-2.5 bg-zinc-800 hover:bg-indigo-600 text-zinc-300 hover:text-white rounded-xl transition-all shrink-0"
+                className="p-2.5 bg-zinc-800 hover:bg-[#25D366] text-zinc-300 hover:text-black rounded-xl transition-all shrink-0"
                 title="Record voice note"
               >
                 <Mic className="w-4 h-4" />

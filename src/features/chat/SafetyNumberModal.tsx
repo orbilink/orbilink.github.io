@@ -96,7 +96,7 @@ export const SafetyNumberModal: React.FC<SafetyNumberModalProps> = ({
             <div>
               <p className="font-semibold text-amber-300">Safety Number Changed</p>
               <p className="mt-0.5 text-slate-300">
-                {contactDisplayName}&apos;s cryptographic identity key changed. This typically happens when they reinstall RYNOX or register a new device.
+                {contactDisplayName}&apos;s cryptographic identity key changed. This typically happens when they reinstall ORBILINK or register a new device.
               </p>
             </div>
           </div>

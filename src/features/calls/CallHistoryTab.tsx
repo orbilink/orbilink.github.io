@@ -67,7 +67,7 @@ export const CallHistoryTab: React.FC<CallHistoryTabProps> = ({
   };
 
   return (
-    <div className="flex flex-col h-full bg-neutral-950/60" id="rynox-call-history">
+    <div className="flex flex-col h-full bg-neutral-950/60" id="orbilink-call-history">
       {/* Header Bar */}
       <div className="p-4 border-b border-neutral-800/80 bg-neutral-950/90 backdrop-blur-md">
         <div className="flex items-center justify-between mb-3">

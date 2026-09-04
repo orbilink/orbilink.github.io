@@ -7,7 +7,7 @@ import {
 } from '../../types/crypto';
 import { indexedDbService } from '../storage/indexedDbService';
 
-const HKDF_INFO_PREFIX = 'RYNOX-E2EE-V2-SESSION';
+const HKDF_INFO_PREFIX = 'ORBILINK-E2EE-V2-SESSION';
 const DEVICE_STORAGE_ID = 'local_device_keys';
 
 export class WebCryptoService {
@@ -263,7 +263,7 @@ export class WebCryptoService {
     );
 
     const encoder = new TextEncoder();
-    const salt = encoder.encode('RYNOX-E2EE-SALT-V2');
+    const salt = encoder.encode('ORBILINK-E2EE-SALT-V2');
     const info = encoder.encode(`${HKDF_INFO_PREFIX}-${contextInfo}`);
 
     // Derive 256-bit AES-GCM Pairwise Session Key

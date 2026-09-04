@@ -81,7 +81,7 @@ export const MediaPreviewModal: React.FC<MediaPreviewModalProps> = ({
       setIsUploading(false);
       onClose();
     } catch (err: unknown) {
-      console.error('[RYNOX] Media upload error:', err);
+      console.error('[ORBILINK] Media upload error:', err);
       const errMsg = err instanceof Error ? err.message : 'Upload failed. Please check your connection and Firebase Storage setup.';
       setUploadError(errMsg);
       setIsUploading(false);

@@ -187,12 +187,13 @@ class AuthService {
 
   private async init() {
     // 1. Try to load user from LocalStorage for instant UI hydration
-    const savedUserJson = localStorage.getItem('rynox_active_user');
+    const savedUserJson = localStorage.getItem('orbilink_active_user') || localStorage.getItem('rynox_active_user');
     if (savedUserJson) {
       try {
         this.currentUser = JSON.parse(savedUserJson);
       } catch {
         this.currentUser = null;
+        localStorage.removeItem('orbilink_active_user');
         localStorage.removeItem('rynox_active_user');
       }
     } else {
@@ -207,14 +208,14 @@ class AuthService {
           if (result?.user) {
             const profile = await this.fetchOrCreateProfile(result.user);
             this.currentUser = profile;
-            localStorage.setItem('rynox_active_user', JSON.stringify(profile));
+            localStorage.setItem('orbilink_active_user', JSON.stringify(profile));
             await indexedDbService.saveUser(profile).catch(() => {});
             await this.setOnlinePresence(true);
             this.notify();
           }
         })
         .catch((err) => {
-          console.warn('[RYNOX Auth] getRedirectResult check:', err);
+          console.warn('[ORBILINK Auth] getRedirectResult check:', err);
         });
 
       onAuthStateChanged(auth, async (fbUser: FirebaseUser | null) => {
@@ -222,15 +223,16 @@ class AuthService {
           try {
             const profile = await this.fetchOrCreateProfile(fbUser);
             this.currentUser = profile;
-            localStorage.setItem('rynox_active_user', JSON.stringify(profile));
+            localStorage.setItem('orbilink_active_user', JSON.stringify(profile));
             await indexedDbService.saveUser(profile).catch(() => {});
             await this.setOnlinePresence(true);
           } catch (err) {
-            console.error('[RYNOX Auth] Error syncing profile for auth user:', err);
+            console.error('[ORBILINK Auth] Error syncing profile for auth user:', err);
           }
         } else {
           this.currentUser = null;
           this.cachedGoogleAccessToken = null;
+          localStorage.removeItem('orbilink_active_user');
           localStorage.removeItem('rynox_active_user');
         }
         this.isInitialized = true;
@@ -238,7 +240,7 @@ class AuthService {
       });
     } else {
       const diag = getFirebaseDiagnostics();
-      console.warn('[RYNOX Auth] Firebase Auth not available on startup:', diag.initializationError);
+      console.warn('[ORBILINK Auth] Firebase Auth not available on startup:', diag.initializationError);
       this.isInitialized = true;
       this.notify();
     }
@@ -414,7 +416,7 @@ class AuthService {
             throw lookupErr;
           }
         }
-        console.warn('[RYNOX Auth] Could not resolve username to email:', lookupErr);
+        console.warn('[ORBILINK Auth] Could not resolve username to email:', lookupErr);
         throw new Error(`Could not resolve username @${cleanUser}. Please try signing in with your email address.`);
       }
     }
@@ -423,7 +425,7 @@ class AuthService {
       const cred = await signInWithEmailAndPassword(auth, emailToUse, password);
       const profile = await this.fetchOrCreateProfile(cred.user);
       this.currentUser = profile;
-      localStorage.setItem('rynox_active_user', JSON.stringify(profile));
+      localStorage.setItem('orbilink_active_user', JSON.stringify(profile));
       await indexedDbService.saveUser(profile).catch(() => {});
       await this.setOnlinePresence(true);
       this.notify();
@@ -503,7 +505,7 @@ class AuthService {
 
       const profile = await this.fetchOrCreateProfile(fbUser);
       this.currentUser = profile;
-      localStorage.setItem('rynox_active_user', JSON.stringify(profile));
+      localStorage.setItem('orbilink_active_user', JSON.stringify(profile));
       await indexedDbService.saveUser(profile).catch(() => {});
       await this.setOnlinePresence(true);
       this.notify();
@@ -574,7 +576,7 @@ class AuthService {
         photoURL: '',
         avatarUrl: '',
         avatarColor: 'from-emerald-500 to-teal-700',
-        about: 'Hey there! I am using RYNOX.',
+        about: 'Hey there! I am using ORBILINK.',
         isOnline: true,
         lastSeen: now,
         createdAt: now,
@@ -603,7 +605,7 @@ class AuthService {
           });
           firestoreService.markOperationSuccess();
         } catch (dbErr) {
-          console.warn('[RYNOX Auth] Firestore transaction error, attempting direct doc write:', dbErr);
+          console.warn('[ORBILINK Auth] Firestore transaction error, attempting direct doc write:', dbErr);
           await setDoc(doc(db, 'users', uid), newProfile);
           await setDoc(doc(db, 'usernames', cleanUsername), { uid, email: cleanEmail, createdAt: now });
           firestoreService.markOperationSuccess();
@@ -621,7 +623,7 @@ class AuthService {
       }
 
       this.currentUser = newProfile;
-      localStorage.setItem('rynox_active_user', JSON.stringify(newProfile));
+      localStorage.setItem('orbilink_active_user', JSON.stringify(newProfile));
       await indexedDbService.saveUser(newProfile).catch(() => {});
       this.notify();
       return newProfile;
@@ -685,7 +687,7 @@ class AuthService {
     cleanPayload.id = uid;
     cleanPayload.uid = uid;
     if (typeof cleanPayload.displayName !== 'string' || !cleanPayload.displayName.trim()) {
-      cleanPayload.displayName = this.currentUser.displayName || 'RYNOX User';
+      cleanPayload.displayName = this.currentUser.displayName || 'ORBILINK User';
     }
 
     if (isLiveFirebase() && db) {
@@ -712,13 +714,13 @@ class AuthService {
           await setDoc(doc(db, 'users', uid), cleanPayload, { merge: true });
         }
       } catch (err: unknown) {
-        console.warn('[RYNOX Auth] Cloud Firestore profile update notice:', err);
+        console.warn('[ORBILINK Auth] Cloud Firestore profile update notice:', err);
         // If Firestore write fails, we continue to save locally so user is not blocked
       }
     }
 
     this.currentUser = updatedProfile;
-    localStorage.setItem('rynox_active_user', JSON.stringify(updatedProfile));
+    localStorage.setItem('orbilink_active_user', JSON.stringify(updatedProfile));
     await indexedDbService.saveUser(updatedProfile).catch(() => {});
     this.notify();
     return updatedProfile;
@@ -726,7 +728,7 @@ class AuthService {
 
   public async switchAccount(profile: UserProfile): Promise<void> {
     this.currentUser = profile;
-    localStorage.setItem('rynox_active_user', JSON.stringify(profile));
+    localStorage.setItem('orbilink_active_user', JSON.stringify(profile));
     await indexedDbService.saveUser(profile).catch(() => {});
     this.notify();
   }
@@ -751,6 +753,7 @@ class AuthService {
     this.currentUser = null;
     this.cachedGoogleAccessToken = null;
     try {
+      localStorage.removeItem('orbilink_active_user');
       localStorage.removeItem('rynox_active_user');
       sessionStorage.clear();
     } catch {
@@ -765,7 +768,7 @@ class AuthService {
     if (this.currentUser && (this.currentUser.uid === fbUser.uid || this.currentUser.id === fbUser.uid)) {
       return this.currentUser;
     }
-    const savedUserJson = localStorage.getItem('rynox_active_user');
+    const savedUserJson = localStorage.getItem('orbilink_active_user') || localStorage.getItem('rynox_active_user');
     if (savedUserJson) {
       try {
         const parsed = JSON.parse(savedUserJson) as UserProfile;
@@ -827,7 +830,7 @@ class AuthService {
       photoURL: fbUser.photoURL || '',
       avatarUrl: fbUser.photoURL || '',
       avatarColor: 'from-emerald-500 to-teal-700',
-      about: 'Hey there! I am using RYNOX.',
+      about: 'Hey there! I am using ORBILINK.',
       isOnline: true,
       lastSeen: now,
       createdAt: now,

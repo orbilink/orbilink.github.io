@@ -43,7 +43,7 @@ export const NewGroupModal: React.FC<NewGroupModalProps> = ({
         {/* Header */}
         <div className="flex items-center justify-between border-b border-white/5 pb-3">
           <div className="flex items-center gap-2">
-            <Users className="w-5 h-5 text-indigo-400" />
+            <Users className="w-5 h-5 text-[#25D366]" />
             <h3 className="text-sm font-bold text-white">Create New Channel / Group</h3>
           </div>
           <button
@@ -66,7 +66,7 @@ export const NewGroupModal: React.FC<NewGroupModalProps> = ({
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="e.g. Frontend Architecture"
-              className="w-full px-3.5 py-2 bg-zinc-950 border border-white/10 rounded-xl text-xs text-zinc-100 focus:outline-none focus:border-indigo-500/50"
+              className="w-full px-3.5 py-2 bg-zinc-950 border border-white/10 rounded-xl text-xs text-zinc-100 focus:outline-none focus:border-[#25D366]/50"
             />
           </div>
 
@@ -79,7 +79,7 @@ export const NewGroupModal: React.FC<NewGroupModalProps> = ({
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Brief purpose of this channel..."
-              className="w-full px-3.5 py-2 bg-zinc-950 border border-white/10 rounded-xl text-xs text-zinc-100 focus:outline-none focus:border-indigo-500/50"
+              className="w-full px-3.5 py-2 bg-zinc-950 border border-white/10 rounded-xl text-xs text-zinc-100 focus:outline-none focus:border-[#25D366]/50"
             />
           </div>
 
@@ -96,7 +96,7 @@ export const NewGroupModal: React.FC<NewGroupModalProps> = ({
                     onClick={() => toggleUser(u.id)}
                     className={`flex items-center justify-between p-2 rounded-lg cursor-pointer text-xs transition-colors ${
                       isSelected
-                        ? 'bg-indigo-600/20 text-indigo-200 border border-indigo-500/30'
+                        ? 'bg-emerald-600/20 text-emerald-200 border border-emerald-500/30'
                         : 'hover:bg-zinc-800 text-zinc-300'
                     }`}
                   >
@@ -109,7 +109,7 @@ export const NewGroupModal: React.FC<NewGroupModalProps> = ({
                       />
                       <span>{u.name}</span>
                     </div>
-                    {isSelected && <Check className="w-3.5 h-3.5 text-indigo-400" />}
+                    {isSelected && <Check className="w-3.5 h-3.5 text-[#25D366]" />}
                   </div>
                 );
               })}
@@ -127,7 +127,7 @@ export const NewGroupModal: React.FC<NewGroupModalProps> = ({
             <button
               type="submit"
               disabled={!name.trim()}
-              className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white text-xs font-semibold shadow-md"
+              className="px-4 py-2 rounded-xl bg-[#25D366] hover:bg-[#1ebd5d] disabled:opacity-50 text-black text-xs font-bold shadow-md"
             >
               Create Channel
             </button>

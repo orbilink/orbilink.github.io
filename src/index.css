@@ -1,5 +1,13 @@
 @import "tailwindcss";
 
+@theme {
+  --color-brand: #25D366;
+  --color-brand-primary: #25D366;
+  --color-brand-dark: #128C7E;
+  --color-brand-deeper: #075E54;
+  --color-brand-accent: #25D366;
+}
+
 @layer base {
   * {
     border-color: rgba(255, 255, 255, 0.08);

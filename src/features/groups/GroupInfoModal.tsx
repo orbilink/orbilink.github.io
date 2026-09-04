@@ -47,7 +47,7 @@ export const GroupInfoModal: React.FC<GroupInfoModalProps> = ({
         {/* Participants list */}
         <div>
           <h4 className="text-xs font-semibold text-zinc-400 mb-2 flex items-center gap-1.5">
-            <Users className="w-3.5 h-3.5 text-indigo-400" />
+            <Users className="w-3.5 h-3.5 text-[#25D366]" />
             <span>Participants ({chat.participants?.length || 1})</span>
           </h4>
           <div className="max-h-40 overflow-y-auto space-y-1.5 pr-1">
@@ -69,7 +69,7 @@ export const GroupInfoModal: React.FC<GroupInfoModalProps> = ({
                   </div>
                 </div>
                 {p.id === 'usr_ai' && (
-                  <span className="text-[10px] px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+                  <span className="text-[10px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
                     AI Assistant
                   </span>
                 )}
@@ -90,10 +90,10 @@ export const GroupInfoModal: React.FC<GroupInfoModalProps> = ({
 
           <div className="flex items-center justify-between p-2.5 rounded-xl bg-zinc-950/40 border border-white/5 text-xs text-zinc-300">
             <span className="flex items-center gap-2">
-              <Bell className="w-4 h-4 text-indigo-400" />
+              <Bell className="w-4 h-4 text-[#25D366]" />
               <span>Notifications</span>
             </span>
-            <span className="text-[11px] text-indigo-300 font-semibold">Enabled</span>
+            <span className="text-[11px] text-[#25D366] font-semibold">Enabled</span>
           </div>
         </div>
 

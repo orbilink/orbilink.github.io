@@ -99,7 +99,7 @@ class NotificationService {
     onAccept?: () => void
   ) {
     const title = `Incoming ${callType === 'video' ? 'Video' : 'Voice'} Call`;
-    const body = `${callerName} is calling you on RYNOX`;
+    const body = `${callerName} is calling you on ORBILINK`;
 
     if (this.hasNotificationSupport && Notification.permission === 'granted') {
       try {

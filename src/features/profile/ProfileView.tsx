@@ -45,10 +45,10 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                 src={currentUser.avatarUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80'}
                 alt={currentUser.name}
                 referrerPolicy="no-referrer"
-                className="w-20 h-20 rounded-full object-cover border-2 border-indigo-500/50 shadow-lg shadow-indigo-500/10"
+                className="w-20 h-20 rounded-full object-cover border-2 border-[#25D366]/50 shadow-lg shadow-[#25D366]/10"
               />
               <button
-                className="absolute bottom-0 right-0 p-1.5 rounded-full bg-indigo-600 hover:bg-indigo-500 text-white shadow-md transition-colors"
+                className="absolute bottom-0 right-0 p-1.5 rounded-full bg-[#25D366] hover:bg-[#1ebd5d] text-black shadow-md transition-colors"
                 title="Update avatar"
               >
                 <Camera className="w-3.5 h-3.5" />
@@ -57,7 +57,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
             <div>
               <h2 className="text-base font-bold text-white flex items-center gap-1.5">
                 {name}
-                <span className="text-[10px] px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+                <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
                   Verified
                 </span>
               </h2>
@@ -79,7 +79,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full px-4 py-2.5 bg-zinc-950 border border-white/10 rounded-xl text-xs text-zinc-100 focus:outline-none focus:border-indigo-500/50"
+                className="w-full px-4 py-2.5 bg-zinc-950 border border-white/10 rounded-xl text-xs text-zinc-100 focus:outline-none focus:border-[#25D366]/50"
               />
             </div>
 
@@ -91,7 +91,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                 type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                className="w-full px-4 py-2.5 bg-zinc-950 border border-white/10 rounded-xl text-xs text-zinc-100 focus:outline-none focus:border-indigo-500/50"
+                className="w-full px-4 py-2.5 bg-zinc-950 border border-white/10 rounded-xl text-xs text-zinc-100 focus:outline-none focus:border-[#25D366]/50"
               />
             </div>
 
@@ -104,7 +104,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                 value={status}
                 onChange={(e) => setStatus(e.target.value)}
                 placeholder="What are you currently focusing on?"
-                className="w-full px-4 py-2.5 bg-zinc-950 border border-white/10 rounded-xl text-xs text-zinc-100 focus:outline-none focus:border-indigo-500/50"
+                className="w-full px-4 py-2.5 bg-zinc-950 border border-white/10 rounded-xl text-xs text-zinc-100 focus:outline-none focus:border-[#25D366]/50"
               />
             </div>
 
@@ -116,7 +116,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                 rows={3}
                 value={bio}
                 onChange={(e) => setBio(e.target.value)}
-                className="w-full px-4 py-2.5 bg-zinc-950 border border-white/10 rounded-xl text-xs text-zinc-100 focus:outline-none focus:border-indigo-500/50 resize-none"
+                className="w-full px-4 py-2.5 bg-zinc-950 border border-white/10 rounded-xl text-xs text-zinc-100 focus:outline-none focus:border-[#25D366]/50 resize-none"
               />
             </div>
 
@@ -128,7 +128,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
 
               <button
                 type="submit"
-                className="flex items-center gap-1.5 px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-md shadow-indigo-600/20 transition-all"
+                className="flex items-center gap-1.5 px-5 py-2 rounded-xl bg-[#25D366] hover:bg-[#1ebd5d] text-black text-xs font-bold shadow-md shadow-[#25D366]/20 transition-all"
               >
                 {isSaved ? (
                   <>

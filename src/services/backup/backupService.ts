@@ -23,8 +23,8 @@ import { storageService } from '../firebase/storageService';
 import { getFirebaseDb, isLiveFirebase } from '../firebase/firebaseApp';
 import { cryptoService } from '../crypto/cryptoService';
 
-const AUTO_BACKUP_STORAGE_KEY = 'rynox_encrypted_auto_backup_enabled';
-const LAST_BACKUP_STORAGE_KEY = 'rynox_last_backup_timestamp';
+const AUTO_BACKUP_STORAGE_KEY = 'orbilink_encrypted_auto_backup_enabled';
+const LAST_BACKUP_STORAGE_KEY = 'orbilink_last_backup_timestamp';
 
 export class BackupService {
   /**
@@ -94,7 +94,7 @@ export class BackupService {
         createdAt: Date.now(),
         userId: currentUser.id,
         deviceId,
-        deviceName: currentUser.displayName ? `${currentUser.displayName}'s Device` : 'RYNOX Client Device',
+        deviceName: currentUser.displayName ? `${currentUser.displayName}'s Device` : 'ORBILINK Client Device',
         chats,
         messages,
         contacts,
@@ -133,7 +133,7 @@ export class BackupService {
           storagePath = uploadRes.storagePath;
           downloadUrl = uploadRes.downloadUrl;
         } catch (uploadErr) {
-          console.warn('[RYNOX Backup] Storage upload fallback to Firestore metadata:', uploadErr);
+          console.warn('[ORBILINK Backup] Storage upload fallback to Firestore metadata:', uploadErr);
         }
       }
 
@@ -164,7 +164,7 @@ export class BackupService {
             envelopeJson: encryptedBlob.size < 500000 ? JSON.stringify(envelope) : undefined,
           });
         } catch (dbErr) {
-          console.warn('[RYNOX Backup] Firestore backup metadata write notice:', dbErr);
+          console.warn('[ORBILINK Backup] Firestore backup metadata write notice:', dbErr);
         }
       }
 
@@ -209,7 +209,7 @@ export class BackupService {
           cryptographicVersion: data.cryptographicVersion || 'AES-256-GCM+PBKDF2-SHA256',
           userId: data.userId || userId,
           deviceId: data.deviceId || 'Unknown',
-          deviceName: data.deviceName || 'RYNOX Device',
+          deviceName: data.deviceName || 'ORBILINK Device',
           createdAt: data.createdAt || Date.now(),
           sizeBytes: data.sizeBytes || 0,
           messageCount: data.messageCount || 0,
@@ -222,7 +222,7 @@ export class BackupService {
 
       return results;
     } catch (err: unknown) {
-      console.error('[RYNOX Backup] Error listing backups:', err);
+      console.error('[ORBILINK Backup] Error listing backups:', err);
       return [];
     }
   }
@@ -399,7 +399,7 @@ export class BackupService {
       try {
         await storageService.deleteEncryptedBackup(storagePath);
       } catch (err) {
-        console.warn('[RYNOX Backup] Storage delete warning:', err);
+        console.warn('[ORBILINK Backup] Storage delete warning:', err);
       }
     }
 

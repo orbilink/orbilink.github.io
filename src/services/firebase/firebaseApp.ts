@@ -68,7 +68,7 @@ export const initFirebase = (): {
 
   if (!validation.isComplete) {
     initializationError = `Missing required Firebase environment variables: ${validation.missingKeys.join(', ')}`;
-    console.warn(`[RYNOX Firebase] Initialization halted: ${initializationError}`);
+    console.warn(`[ORBILINK Firebase] Initialization halted: ${initializationError}`);
     return {
       app: null,
       auth: null,
@@ -119,15 +119,15 @@ export const initFirebase = (): {
       try {
         storage = getStorage(app);
       } catch (storageErr) {
-        console.warn('[RYNOX Firebase] Storage initialization error:', storageErr);
+        console.warn('[ORBILINK Firebase] Storage initialization error:', storageErr);
       }
     }
 
-    console.log('[RYNOX Firebase] Successfully initialized Firebase backend services.');
+    console.log('[ORBILINK Firebase] Successfully initialized Firebase backend services.');
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : String(err);
     initializationError = message;
-    console.error('[RYNOX Firebase] Fatal initialization error:', err);
+    console.error('[ORBILINK Firebase] Fatal initialization error:', err);
   }
 
   return {
@@ -160,7 +160,7 @@ export const getFirebaseDiagnostics = (): FirebaseDiagnosticState => {
 try {
   initFirebase();
 } catch (e) {
-  console.warn('[RYNOX Firebase] Top-level initialization caught:', e);
+  console.warn('[ORBILINK Firebase] Top-level initialization caught:', e);
 }
 
 export const getFirebaseAuth = (): Auth | null => {

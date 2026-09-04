@@ -134,7 +134,7 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({
   };
 
   return (
-    <div className="flex flex-col h-full bg-neutral-950/40 relative overflow-hidden" id="rynox-chatscreen">
+    <div className="flex flex-col h-full bg-neutral-950/40 relative overflow-hidden" id="orbilink-chatscreen">
       {/* Lightboxes and Modals */}
       {activeMedia && (
         <MediaLightbox

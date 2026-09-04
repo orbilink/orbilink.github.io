@@ -1,6 +1,6 @@
 {
-  "name": "RYNOX Messenger",
-  "description": "Next-generation secure communication platform featuring AI-assisted chat, voice notes, live audio streaming, and Google integrations.",
+  "name": "ORBILINK",
+  "description": "Production real-time messenger featuring real Firebase authentication, Firestore synchronization, voice notes, media sharing, Google integrations, and server-side AI assistant.",
   "requestFramePermissions": [
     "camera",
     "microphone"

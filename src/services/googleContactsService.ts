@@ -119,9 +119,9 @@ export class GoogleContactsService {
   }
 
   /**
-   * Correlates Google Contacts with registered RYNOX users in Cloud Firestore
+   * Correlates Google Contacts with registered ORBILINK users in Cloud Firestore
    */
-  public async matchWithRynoxUsers(contacts: GoogleContact[]): Promise<GoogleContact[]> {
+  public async matchWithOrbilinkUsers(contacts: GoogleContact[]): Promise<GoogleContact[]> {
     const db = getFirebaseDb();
     if (!isLiveFirebase() || !db || contacts.length === 0) {
       return contacts;
@@ -158,17 +158,19 @@ export class GoogleContactsService {
           const targetIndices = emailToContactIdxs.get(userEmail);
           if (targetIndices) {
             targetIndices.forEach((targetIdx) => {
+              const matchedUserObj = {
+                id: docSnap.id,
+                username: u.username || 'user',
+                displayName: u.displayName || u.username || 'User',
+                avatarColor: u.avatarColor || '#25D366',
+                avatarUrl: u.avatarUrl || u.photoURL,
+                isOnline: !!u.isOnline,
+                about: u.about,
+              };
               matchedContacts[targetIdx] = {
                 ...matchedContacts[targetIdx],
-                matchedRynoxUser: {
-                  id: docSnap.id,
-                  username: u.username || 'user',
-                  displayName: u.displayName || u.username || 'User',
-                  avatarColor: u.avatarColor || 'from-emerald-500 to-teal-700',
-                  avatarUrl: u.avatarUrl || u.photoURL,
-                  isOnline: !!u.isOnline,
-                  about: u.about,
-                },
+                isOrbilinkUser: true,
+                matchedOrbilinkUser: matchedUserObj,
               };
             });
           }
@@ -326,7 +328,7 @@ export class GoogleContactsService {
       jobTitle,
       addresses,
       isOtherContact: isOther,
-      matchedRynoxUser: null,
+      matchedOrbilinkUser: null,
     };
   }
 }

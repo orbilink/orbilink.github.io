@@ -39,7 +39,7 @@ export const GoogleDrivePickerModal: React.FC<GoogleDrivePickerModalProps> = ({
         {/* Header */}
         <div className="flex items-center justify-between border-b border-white/5 pb-3">
           <div className="flex items-center gap-2">
-            <HardDrive className="w-5 h-5 text-indigo-400" />
+            <HardDrive className="w-5 h-5 text-[#25D366]" />
             <h3 className="text-sm font-bold text-white">Google Drive File Picker</h3>
           </div>
           <button
@@ -58,7 +58,7 @@ export const GoogleDrivePickerModal: React.FC<GoogleDrivePickerModalProps> = ({
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search Drive documents..."
-            className="w-full pl-10 pr-4 py-2 bg-zinc-950 border border-white/10 rounded-xl text-xs text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-indigo-500/50"
+            className="w-full pl-10 pr-4 py-2 bg-zinc-950 border border-white/10 rounded-xl text-xs text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-[#25D366]/50"
           />
         </div>
 
@@ -72,18 +72,18 @@ export const GoogleDrivePickerModal: React.FC<GoogleDrivePickerModalProps> = ({
                 onClick={() => setSelectedId(file.id)}
                 className={`flex items-center justify-between p-3 rounded-xl cursor-pointer border transition-all ${
                   isSelected
-                    ? 'bg-indigo-600/20 border-indigo-500 text-white'
+                    ? 'bg-emerald-600/20 border-[#25D366] text-white'
                     : 'bg-zinc-950/60 border-white/5 hover:border-zinc-700 text-zinc-300'
                 }`}
               >
                 <div className="flex items-center gap-3 min-w-0">
-                  <FileText className="w-4 h-4 text-indigo-400 shrink-0" />
+                  <FileText className="w-4 h-4 text-[#25D366] shrink-0" />
                   <div className="min-w-0">
                     <p className="text-xs font-semibold truncate">{file.name}</p>
                     <p className="text-[10px] text-zinc-500">{file.size} • {file.modifiedTime}</p>
                   </div>
                 </div>
-                {isSelected && <Check className="w-4 h-4 text-indigo-400 shrink-0" />}
+                {isSelected && <Check className="w-4 h-4 text-[#25D366] shrink-0" />}
               </div>
             );
           })}
@@ -100,7 +100,7 @@ export const GoogleDrivePickerModal: React.FC<GoogleDrivePickerModalProps> = ({
           <button
             onClick={handleConfirm}
             disabled={!selectedId}
-            className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white text-xs font-semibold shadow-md"
+            className="px-4 py-2 rounded-xl bg-[#25D366] hover:bg-[#1ebd5d] disabled:opacity-50 text-black text-xs font-bold shadow-md"
           >
             Attach File
           </button>

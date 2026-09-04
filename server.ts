@@ -27,7 +27,7 @@ function getGeminiClient(): GoogleGenAI | null {
 app.get('/api/health', (_req, res) => {
   res.json({
     status: 'ok',
-    service: 'RYNOX Messenger Engine',
+    service: 'ORBILINK Messenger Engine',
     geminiConfigured: !!process.env.GEMINI_API_KEY,
     timestamp: new Date().toISOString()
   });
@@ -59,7 +59,7 @@ app.post('/api/ai/chat', async (req, res) => {
       role: 'user',
       parts: [
         {
-          text: `You are RYNOX Intelligence, an AI assistant inside the RYNOX real-time messaging application. Assist the user concisely, helpfully, and accurately.\n\nUser Prompt: ${prompt}`
+          text: `You are ORBILINK AI, an intelligent AI assistant inside the ORBILINK real-time messaging application. Assist the user concisely, helpfully, and accurately.\n\nUser Prompt: ${prompt}`
         }
       ]
     });
@@ -242,7 +242,7 @@ async function start() {
   }
 
   server.listen(PORT, '0.0.0.0', () => {
-    console.log(`[RYNOX Messenger] Server running on http://0.0.0.0:${PORT}`);
+    console.log(`[ORBILINK Messenger] Server running on http://0.0.0.0:${PORT}`);
   });
 }
 

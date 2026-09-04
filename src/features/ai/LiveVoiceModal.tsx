@@ -63,10 +63,10 @@ export const LiveVoiceModal: React.FC<LiveVoiceModalProps> = ({ isOpen, onClose 
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
-      <div className="relative w-full max-w-md bg-gradient-to-b from-zinc-900 to-zinc-950 border border-indigo-500/30 rounded-3xl p-6 sm:p-8 text-center shadow-2xl shadow-indigo-950/40">
+      <div className="relative w-full max-w-md bg-gradient-to-b from-zinc-900 to-zinc-950 border border-[#25D366]/30 rounded-3xl p-6 sm:p-8 text-center shadow-2xl shadow-emerald-950/40">
         
         {/* Header */}
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 text-xs font-semibold mb-6">
+        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#25D366]/10 border border-[#25D366]/20 text-[#25D366] text-xs font-semibold mb-6">
           <Sparkles className="w-3.5 h-3.5" />
           <span>Gemini Live Voice • Real-Time Audio</span>
         </div>
@@ -75,14 +75,14 @@ export const LiveVoiceModal: React.FC<LiveVoiceModalProps> = ({ isOpen, onClose 
         <div className="relative flex items-center justify-center my-6">
           {/* Animated Glow Rings */}
           <div
-            className="absolute w-44 h-44 rounded-full bg-indigo-500/20 blur-xl transition-all duration-300"
+            className="absolute w-44 h-44 rounded-full bg-[#25D366]/20 blur-xl transition-all duration-300"
             style={{
               transform: `scale(${1 + voiceState.rmsLevel * 0.8})`,
               opacity: voiceState.isSpeaking || voiceState.rmsLevel > 0.1 ? 0.8 : 0.3
             }}
           />
           <div
-            className="w-32 h-32 rounded-full bg-gradient-to-br from-indigo-500 via-indigo-600 to-purple-700 flex items-center justify-center shadow-lg shadow-indigo-500/30 transition-transform duration-150"
+            className="w-32 h-32 rounded-full bg-gradient-to-br from-[#25D366] via-[#128C7E] to-[#075E54] flex items-center justify-center shadow-lg shadow-[#25D366]/30 transition-transform duration-150"
             style={{
               transform: `scale(${1 + voiceState.rmsLevel * 0.25})`
             }}
@@ -100,7 +100,7 @@ export const LiveVoiceModal: React.FC<LiveVoiceModalProps> = ({ isOpen, onClose 
         {/* Status Text */}
         <h3 className="text-lg font-bold text-white mb-1">
           {voiceState.isSpeaking
-            ? 'RYNOX is speaking...'
+            ? 'ORBILINK AI is speaking...'
             : isMuted
             ? 'Microphone muted'
             : 'Listening...'}
@@ -111,8 +111,8 @@ export const LiveVoiceModal: React.FC<LiveVoiceModalProps> = ({ isOpen, onClose 
 
         {/* AI response caption box */}
         {voiceState.aiResponse && (
-          <div className="mt-4 p-3 rounded-2xl bg-indigo-950/30 border border-indigo-500/20 text-xs text-indigo-200 text-left max-h-24 overflow-y-auto">
-            <span className="font-semibold text-indigo-400 block mb-0.5">Response:</span>
+          <div className="mt-4 p-3 rounded-2xl bg-emerald-950/30 border border-[#25D366]/20 text-xs text-emerald-200 text-left max-h-24 overflow-y-auto">
+            <span className="font-semibold text-[#25D366] block mb-0.5">Response:</span>
             {voiceState.aiResponse}
           </div>
         )}

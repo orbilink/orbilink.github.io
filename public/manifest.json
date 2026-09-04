@@ -1,0 +1,16 @@
+{
+  "name": "ORBILINK Messenger",
+  "short_name": "ORBILINK",
+  "description": "Production real-time messenger featuring real Firebase authentication, Firestore synchronization, voice notes, media sharing, Google integrations, and server-side AI assistant.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#09090b",
+  "theme_color": "#128C7E",
+  "icons": [
+    {
+      "src": "/app-favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    }
+  ]
+}

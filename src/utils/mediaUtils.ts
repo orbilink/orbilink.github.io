@@ -25,13 +25,13 @@ export function blobToDataURL(blob: Blob): Promise<string> {
 
 export const AVATAR_PALETTES = [
   'from-emerald-500 to-teal-700',
-  'from-cyan-500 to-blue-700',
-  'from-indigo-500 to-purple-700',
-  'from-violet-500 to-pink-700',
-  'from-amber-500 to-orange-700',
-  'from-rose-500 to-red-700',
-  'from-lime-500 to-green-700',
-  'from-sky-500 to-indigo-700',
+  'from-teal-600 to-emerald-800',
+  'from-emerald-600 to-cyan-800',
+  'from-teal-500 to-emerald-700',
+  'from-emerald-400 to-teal-600',
+  'from-teal-700 to-zinc-800',
+  'from-lime-600 to-emerald-700',
+  'from-cyan-600 to-teal-800',
 ];
 
 export function getAvatarColor(name: string): string {

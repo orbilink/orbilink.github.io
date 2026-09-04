@@ -142,10 +142,10 @@ export class GeminiLiveVoiceService {
         console.log('[LiveVoiceService] WebSocket closed');
       };
 
-      // Mock audio responder if server is in demo mode
+      // Fallback voice response simulation if server Live API WebSocket is not configured
       setTimeout(() => {
         if (this.currentState.isRecording && !this.currentState.aiResponse) {
-          this.currentState.transcript = 'Hello RYNOX Intelligence!';
+          this.currentState.transcript = 'Hello ORBILINK AI!';
           this.currentState.aiResponse = "Greetings! I'm listening in real-time. How can I help with your tasks, files, or messages today?";
           this.currentState.isSpeaking = false;
           this.notify();

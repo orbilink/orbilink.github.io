@@ -76,7 +76,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `rynox_chat_export_${new Date().toISOString().slice(0, 10)}.json`;
+      a.download = `orbilink_chat_export_${new Date().toISOString().slice(0, 10)}.json`;
       a.click();
       URL.revokeObjectURL(url);
       toast.show('Chat history export generated', 'info');
@@ -398,9 +398,9 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             {activeTab === 'about' && (
               <div className="space-y-3">
                 <div className="p-4 bg-neutral-950/60 border border-neutral-800 rounded-2xl space-y-2">
-                  <span className="font-bold text-neutral-100 text-sm block">RYNOX Real-Time Messenger</span>
+                  <span className="font-bold text-neutral-100 text-sm block">ORBILINK Real-Time Messenger</span>
                   <p className="text-xs text-neutral-400 leading-relaxed">
-                    RYNOX is a complete, real-time messaging application powered by Firebase Authentication, Cloud Firestore, Firebase Cloud Storage, and WebRTC audio/video calling.
+                    ORBILINK is a complete, real-time messaging application powered by Firebase Authentication, Cloud Firestore, Firebase Cloud Storage, and WebRTC audio/video calling.
                   </p>
                   <div className="pt-2 flex items-center gap-2 text-[11px] text-emerald-400">
                     <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />

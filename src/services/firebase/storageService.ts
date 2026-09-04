@@ -48,7 +48,7 @@ export class StorageService {
             if (onProgress) onProgress(Math.round(progress));
           },
           (error) => {
-            console.error('[RYNOX] Firebase Storage backup upload error:', error);
+            console.error('[ORBILINK] Firebase Storage backup upload error:', error);
             reject(new Error(`Storage backup upload failed: ${error.message}`));
           },
           async () => {
@@ -107,7 +107,7 @@ export class StorageService {
         const storageRef = ref(storage, storagePath);
         await deleteObject(storageRef);
       } catch (err: unknown) {
-        console.warn('[RYNOX] Storage delete notice:', err);
+        console.warn('[ORBILINK] Storage delete notice:', err);
         // If file already deleted, do not break
       }
     }
@@ -142,7 +142,7 @@ export class StorageService {
             if (onProgress) onProgress(Math.round(progress));
           },
           (error) => {
-            console.error('[RYNOX] Firebase Storage upload error:', error);
+            console.error('[ORBILINK] Firebase Storage upload error:', error);
             reject(new Error(`Storage upload failed: ${error.message}`));
           },
           async () => {

@@ -80,7 +80,7 @@ export class BackupCryptoService {
     const jsonString = JSON.stringify(payload);
     const plaintextBytes = new TextEncoder().encode(jsonString);
 
-    const aadString = `RYNOX-BACKUP-V1:${payload.userId}:${backupId}:${createdAt}`;
+    const aadString = `ORBILINK-BACKUP-V1:${payload.userId}:${backupId}:${createdAt}`;
     const aadBytes = new TextEncoder().encode(aadString);
 
     // 4. Encrypt with AES-GCM (128-bit authentication tag appended automatically)
@@ -203,7 +203,7 @@ export class BackupCryptoService {
         !envelope.backupId ||
         !envelope.userId
       ) {
-        throw new Error('File does not match the RYNOX encrypted backup format.');
+        throw new Error('File does not match the ORBILINK encrypted backup format.');
       }
       return envelope;
     } catch (err: unknown) {

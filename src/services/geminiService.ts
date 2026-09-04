@@ -5,37 +5,45 @@ export interface AiChatResponse {
   suggestedReplies?: string[];
 }
 
+export async function checkGeminiStatus(): Promise<boolean> {
+  try {
+    const res = await fetch('/api/health');
+    if (res.ok) {
+      const data = await res.json();
+      return !!data.geminiConfigured;
+    }
+  } catch {
+    // server unreachable
+  }
+  return false;
+}
+
 export async function askGeminiAssistant(
   prompt: string,
   chatHistory: Message[] = []
 ): Promise<AiChatResponse> {
-  try {
-    const res = await fetch('/api/ai/chat', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        prompt,
-        history: chatHistory.slice(-10).map((m) => ({
-          role: m.senderId === 'usr_ai' ? 'model' : 'user',
-          text: m.content
-        }))
-      })
-    });
+  const res = await fetch('/api/ai/chat', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      prompt,
+      history: chatHistory.slice(-10).map((m) => ({
+        role: m.senderId === 'usr_ai' ? 'model' : 'user',
+        text: m.content
+      }))
+    })
+  });
 
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
-      throw new Error(err.error || `Server responded with status ${res.status}`);
-    }
-
-    const data = await res.json();
-    return {
-      text: data.text || 'I could not generate a response.',
-      suggestedReplies: data.suggestedReplies || []
-    };
-  } catch (error) {
-    console.error('[Gemini Client] AI Chat error:', error);
-    throw error;
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error || `AI error: ${res.status}`);
   }
+
+  const data = await res.json();
+  return {
+    text: data.text,
+    suggestedReplies: data.suggestedReplies || []
+  };
 }
 
 export async function generateSmartReplies(lastMessage: string): Promise<string[]> {
@@ -55,5 +63,6 @@ export async function generateSmartReplies(lastMessage: string): Promise<string[
     // ignore
   }
 
-  return ['Sounds great! 👍', 'Let me review this shortly.', 'Thanks for the update! 🚀'];
+  // Do not return fake replies if unconfigured
+  return [];
 }

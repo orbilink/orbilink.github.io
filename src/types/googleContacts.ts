@@ -14,7 +14,8 @@ export interface GoogleContact {
   addresses?: string[];
   birthday?: string;
   isOtherContact?: boolean;
-  matchedRynoxUser?: {
+  isOrbilinkUser?: boolean;
+  matchedOrbilinkUser?: {
     id: string;
     username: string;
     displayName: string;

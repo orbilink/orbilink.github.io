@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Mic, Square, Trash2, Send, AlertCircle } from 'lucide-react';
 
 interface AudioRecorderProps {
-  onSendVoice: (durationSec: number, waveform: number[]) => void;
+  onSendVoice: (durationSec: number, waveform: number[], audioBlob?: Blob) => void;
   onCancel: () => void;
 }
 
@@ -13,6 +13,7 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({ onSendVoice, onCan
   const [permissionError, setPermissionError] = useState<string | null>(null);
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
   const timerRef = useRef<any>(null);
   const streamRef = useRef<MediaStream | null>(null);
 
@@ -33,11 +34,17 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({ onSendVoice, onCan
   const startRecording = async () => {
     try {
       setPermissionError(null);
+      audioChunksRef.current = [];
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       streamRef.current = stream;
 
       const mediaRecorder = new MediaRecorder(stream);
       mediaRecorderRef.current = mediaRecorder;
+      mediaRecorder.ondataavailable = (e) => {
+        if (e.data && e.data.size > 0) {
+          audioChunksRef.current.push(e.data);
+        }
+      };
       mediaRecorder.start(250);
 
       setIsRecording(true);
@@ -57,10 +64,18 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({ onSendVoice, onCan
   };
 
   const handleSend = () => {
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
+      try {
+        mediaRecorderRef.current.stop();
+      } catch {
+        // ignore
+      }
+    }
     stopTracks();
     const finalDuration = Math.max(1, seconds);
     const finalWaveform = waveform.length > 0 ? waveform : [30, 45, 70, 40, 85, 60, 30, 50];
-    onSendVoice(finalDuration, finalWaveform);
+    const blob = audioChunksRef.current.length > 0 ? new Blob(audioChunksRef.current, { type: 'audio/webm' }) : undefined;
+    onSendVoice(finalDuration, finalWaveform, blob);
   };
 
   const handleCancel = () => {
@@ -92,7 +107,7 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({ onSendVoice, onCan
   }
 
   return (
-    <div className="flex items-center gap-3 w-full bg-zinc-900/90 border border-indigo-500/30 rounded-2xl px-4 py-2.5 shadow-lg shadow-black/40 animate-in fade-in zoom-in-95 duration-150">
+    <div className="flex items-center gap-3 w-full bg-zinc-900/90 border border-[#25D366]/40 rounded-2xl px-4 py-2.5 shadow-lg shadow-black/40 animate-in fade-in zoom-in-95 duration-150">
       <div className="flex items-center gap-2 text-rose-400 font-mono text-sm font-semibold shrink-0">
         <span className="w-2.5 h-2.5 rounded-full bg-rose-500 animate-ping" />
         <span>{formatSecs(seconds)}</span>
@@ -103,7 +118,7 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({ onSendVoice, onCan
         {waveform.map((height, i) => (
           <div
             key={i}
-            className="w-1 bg-gradient-to-t from-indigo-500 to-rose-400 rounded-full transition-all duration-200"
+            className="w-1 bg-gradient-to-t from-[#128C7E] to-[#25D366] rounded-full transition-all duration-200"
             style={{ height: `${Math.max(15, (height / 100) * 32)}px` }}
           />
         ))}
@@ -119,9 +134,9 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({ onSendVoice, onCan
         </button>
         <button
           onClick={handleSend}
-          className="px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-medium text-xs flex items-center gap-1.5 shadow-md shadow-indigo-500/20"
+          className="px-3.5 py-1.5 bg-[#25D366] hover:bg-[#128C7E] text-black rounded-xl font-bold text-xs flex items-center gap-1.5 shadow-md shadow-[#25D366]/20"
         >
-          <Send className="w-3.5 h-3.5" />
+          <Send className="w-3.5 h-3.5 text-black" />
           <span>Send</span>
         </button>
       </div>

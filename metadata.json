@@ -1,0 +1,11 @@
+{
+  "name": "RYNOX Messenger",
+  "description": "Next-generation secure communication platform featuring AI-assisted chat, voice notes, live audio streaming, and Google integrations.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

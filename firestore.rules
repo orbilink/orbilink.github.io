@@ -1,0 +1,199 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Global default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isChatParticipant(chatId) {
+      return isSignedIn() && (
+        request.auth.uid in get(/databases/$(database)/documents/chats/$(chatId)).data.participants
+      );
+    }
+
+    function isCallParty(callId) {
+      return isSignedIn() && (
+        request.auth.uid == get(/databases/$(database)/documents/calls/$(callId)).data.callerId ||
+        request.auth.uid == get(/databases/$(database)/documents/calls/$(callId)).data.calleeId
+      );
+    }
+
+    // --- Users Collection ---
+    match /users/{userId} {
+      // Authenticated users can search and view profiles to start chats
+      allow read: if isSignedIn();
+
+      // Only the user themselves can create or update their own profile document
+      allow create: if isOwner(userId)
+        && (incoming().id == userId || incoming().uid == userId)
+        && incoming().displayName is string
+        && incoming().displayName.size() >= 1
+        && incoming().displayName.size() <= 60
+        && incoming().username is string
+        && incoming().username.size() >= 2
+        && incoming().username.size() <= 30;
+
+      allow update: if isOwner(userId)
+        && (incoming().id == userId || incoming().uid == userId)
+        && incoming().displayName is string
+        && incoming().displayName.size() >= 1
+        && incoming().displayName.size() <= 60;
+
+      allow delete: if false;
+
+      // --- Contacts Subcollection ---
+      // Users can only access and manage their own contacts list
+      match /contacts/{contactId} {
+        allow read, write: if isOwner(userId);
+      }
+
+      // --- Devices Subcollection (Public Key Material Distribution) ---
+      // Authenticated users can read public device identity keys to establish E2EE sessions
+      // Only the user themselves can publish/update their device public keys
+      match /devices/{deviceId} {
+        allow read: if isSignedIn();
+        allow create, update: if isOwner(userId) && incoming().deviceId == deviceId;
+        allow delete: if isOwner(userId);
+      }
+
+      // --- Encrypted Backups Subcollection (Zero-Knowledge Metadata & Envelopes) ---
+      // Users can strictly only read, create, update, or delete their own encrypted backups
+      match /backups/{backupId} {
+        allow read, delete: if isOwner(userId);
+        allow create, update: if isOwner(userId)
+          && (incoming().userId == userId || !('userId' in incoming()));
+      }
+    }
+
+    // --- Usernames Collection (Uniqueness & Login Registry) ---
+    match /usernames/{username} {
+      // Allow read so unauthenticated users can check username availability during registration
+      // and resolve username to authentication email during login
+      allow read: if true;
+
+      // Only the authenticated user can claim a username for their own UID
+      allow create: if isSignedIn()
+        && incoming().uid == request.auth.uid
+        && username.size() >= 2
+        && username.size() <= 30;
+
+      // Only the owner of the username can update it
+      allow update: if isSignedIn()
+        && incoming().uid == request.auth.uid
+        && existing().uid == request.auth.uid;
+
+      // Only the owner of the username can release/delete it when changing username
+      allow delete: if isSignedIn()
+        && existing().uid == request.auth.uid;
+    }
+
+    // --- Chats Collection ---
+    match /chats/{chatId} {
+      // User can read and list chats they belong to
+      allow get: if isSignedIn() && (request.auth.uid in existing().participants);
+      allow list: if isSignedIn() && (request.auth.uid in resource.data.participants);
+
+      // User can create chat if they are in the participants array
+      allow create: if isSignedIn()
+        && request.auth.uid in incoming().participants
+        && incoming().participants.size() >= 1
+        && incoming().participants.size() <= 500;
+
+      // Participants or admins can update chat metadata, lastMessage, typingMap, unread counts, etc.
+      allow update: if isSignedIn() && (
+        request.auth.uid in existing().participants ||
+        request.auth.uid in incoming().participants
+      );
+
+      // Only creator/admin or participant can delete
+      allow delete: if isSignedIn() && (
+        (existing().type == 'direct' && request.auth.uid in existing().participants) ||
+        (existing().type == 'group' && request.auth.uid in existing().admins)
+      );
+
+      // --- Messages Subcollection ---
+      match /messages/{messageId} {
+        // Participant can read and list messages
+        allow get: if isChatParticipant(chatId);
+        allow list: if isChatParticipant(chatId);
+
+        // Sender can create a message if they are a participant
+        allow create: if isSignedIn()
+          && isChatParticipant(chatId)
+          && (incoming().senderId == request.auth.uid || incoming().type == 'system');
+
+        // Message updates:
+        // 1. Author can edit text or soft-delete
+        // 2. Any participant can update reactions, status (read receipts), or deletedFor
+        allow update: if isSignedIn() && isChatParticipant(chatId) && (
+          (existing().senderId == request.auth.uid) ||
+          incoming().diff(existing()).affectedKeys().hasAny(['status', 'reactions', 'deletedFor'])
+        );
+
+        // Author can hard delete if needed
+        allow delete: if isSignedIn() && isChatParticipant(chatId) && (
+          existing().senderId == request.auth.uid
+        );
+      }
+    }
+
+    // --- Calls Collection (WebRTC Signaling) ---
+    match /calls/{callId} {
+      // Either caller or callee can get/list the call signaling document
+      allow get: if isSignedIn() && (
+        existing().callerId == request.auth.uid ||
+        existing().calleeId == request.auth.uid
+      );
+      allow list: if isSignedIn() && (
+        resource.data.callerId == request.auth.uid ||
+        resource.data.calleeId == request.auth.uid
+      );
+
+      // Caller can initiate a real WebRTC call
+      allow create: if isSignedIn()
+        && incoming().callerId == request.auth.uid
+        && incoming().calleeId is string
+        && incoming().type in ['voice', 'video'];
+
+      // Caller or Callee can update signaling state (answer, status, endedAt, duration)
+      allow update: if isSignedIn() && (
+        existing().callerId == request.auth.uid ||
+        existing().calleeId == request.auth.uid
+      );
+
+      // Caller or Callee can delete signaling document when session closes
+      allow delete: if isSignedIn() && (
+        existing().callerId == request.auth.uid ||
+        existing().calleeId == request.auth.uid
+      );
+
+      // --- ICE Candidates Subcollections ---
+      match /callerCandidates/{candidateId} {
+        allow read, write: if isCallParty(callId);
+      }
+
+      match /calleeCandidates/{candidateId} {
+        allow read, write: if isCallParty(callId);
+      }
+    }
+  }
+}

@@ -1,0 +1,186 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "Public and private user account profile stored in Firestore.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Firebase Auth UID" },
+        "email": { "type": "string", "format": "email", "description": "User email address" },
+        "displayName": { "type": "string", "minLength": 1, "maxLength": 60, "description": "Display name shown in chats" },
+        "username": { "type": "string", "minLength": 2, "maxLength": 30, "pattern": "^[a-z0-9_]+$", "description": "Unique username handle" },
+        "avatarUrl": { "type": "string", "maxLength": 100000, "description": "Avatar photo URL or base64 data" },
+        "avatarColor": { "type": "string", "maxLength": 100, "description": "Avatar Tailwind gradient colors" },
+        "about": { "type": "string", "maxLength": 250, "description": "User bio or status headline" },
+        "phone": { "type": "string", "maxLength": 30, "description": "Optional phone number" },
+        "isOnline": { "type": "boolean", "description": "Presence state" },
+        "lastSeen": { "type": "number", "description": "Timestamp of last network interaction" },
+        "createdAt": { "type": "number", "description": "Account registration timestamp" },
+        "publicKeyFingerprint": { "type": "string", "maxLength": 100, "description": "Web Crypto identity fingerprint" }
+      },
+      "required": ["id", "email", "displayName", "username", "createdAt"]
+    },
+    "DevicePublicRecord": {
+      "title": "DevicePublicRecord",
+      "description": "Public device pre-key and identity key distribution record.",
+      "type": "object",
+      "properties": {
+        "deviceId": { "type": "string", "description": "Unique device identifier" },
+        "deviceName": { "type": "string", "description": "Human-readable device label" },
+        "userId": { "type": "string", "description": "Owner account UID" },
+        "identityKeyJwk": { "type": "object", "description": "Public ECDH P-256 identity key in JWK format" },
+        "preKeyJwk": { "type": "object", "description": "Public ECDH P-256 pre-key in JWK format" },
+        "fingerprint": { "type": "string", "description": "SHA-256 fingerprint of public identity key" },
+        "createdAt": { "type": "number", "description": "Device registration timestamp" },
+        "lastSeen": { "type": "number", "description": "Last device heartbeat timestamp" }
+      },
+      "required": ["deviceId", "userId", "identityKeyJwk", "fingerprint", "createdAt"]
+    },
+    "Chat": {
+      "title": "Chat",
+      "description": "1-on-1 direct conversation or multi-user group chat.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique chat conversation ID" },
+        "type": { "type": "string", "enum": ["direct", "group"], "description": "Conversation type" },
+        "name": { "type": "string", "minLength": 1, "maxLength": 100, "description": "Chat display name or group subject" },
+        "avatarUrl": { "type": "string", "maxLength": 100000, "description": "Group avatar URL" },
+        "avatarColor": { "type": "string", "maxLength": 100, "description": "Chat icon gradient colors" },
+        "description": { "type": "string", "maxLength": 500, "description": "Group description or status" },
+        "participants": { "type": "array", "description": "List of participant user UIDs" },
+        "participantProfiles": { "type": "object", "description": "Cached participant profiles for rapid rendering" },
+        "createdBy": { "type": "string", "description": "UID of creator" },
+        "admins": { "type": "array", "description": "UIDs of group administrators" },
+        "members": { "type": "array", "description": "List of group member objects with roles" },
+        "unreadCount": { "type": "number", "description": "Unread counter" },
+        "unreadCountMap": { "type": "object", "description": "Per-user unread counters" },
+        "isPinned": { "type": "boolean", "description": "Global or local pinned flag" },
+        "pinnedBy": { "type": "array", "description": "UIDs who pinned this chat" },
+        "isMuted": { "type": "boolean", "description": "Global or local muted flag" },
+        "mutedBy": { "type": "array", "description": "UIDs who muted this chat" },
+        "isArchived": { "type": "boolean", "description": "Archived status" },
+        "typingUsers": { "type": "array", "description": "List of display names or user IDs typing" },
+        "typingMap": { "type": "object", "description": "Timestamped typing indicators" },
+        "createdAt": { "type": "number", "description": "Creation timestamp" },
+        "updatedAt": { "type": "number", "description": "Last message timestamp" },
+        "lastMessage": { "type": "object", "description": "Summary of the most recent message" }
+      },
+      "required": ["id", "type", "participants", "createdAt", "updatedAt"]
+    },
+    "Contact": {
+      "title": "Contact",
+      "description": "User's saved personal contact record.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique contact record ID" },
+        "userId": { "type": "string", "description": "UID of the saved user" },
+        "displayName": { "type": "string", "maxLength": 60, "description": "Contact display name" },
+        "username": { "type": "string", "maxLength": 30, "description": "Contact unique username" },
+        "avatarUrl": { "type": "string", "description": "Avatar photo URL" },
+        "avatarColor": { "type": "string", "description": "Avatar color theme" },
+        "about": { "type": "string", "maxLength": 250, "description": "Bio or status headline" },
+        "phone": { "type": "string", "maxLength": 30, "description": "Contact phone number" },
+        "isOnline": { "type": "boolean", "description": "Online presence status" },
+        "lastSeen": { "type": "number", "description": "Timestamp of last network activity" },
+        "addedAt": { "type": "number", "description": "Timestamp when added as contact" }
+      },
+      "required": ["id", "userId", "displayName", "username", "addedAt"]
+    },
+    "Message": {
+      "title": "Message",
+      "description": "Real-time message record within a conversation.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique message ID" },
+        "chatId": { "type": "string", "description": "Parent conversation ID" },
+        "senderId": { "type": "string", "description": "UID of the author" },
+        "senderDeviceId": { "type": "string", "description": "Device ID of the sender" },
+        "senderName": { "type": "string", "maxLength": 100, "description": "Author display name" },
+        "senderAvatar": { "type": "string", "maxLength": 100000, "description": "Author avatar URL" },
+        "senderColor": { "type": "string", "maxLength": 100, "description": "Author avatar color" },
+        "ciphertext": { "type": "string", "maxLength": 500000, "description": "Base64 AES-256-GCM ciphertext" },
+        "iv": { "type": "string", "maxLength": 64, "description": "Base64 96-bit AES-GCM IV" },
+        "aad": { "type": "string", "maxLength": 2000, "description": "Base64 Authenticated Additional Data" },
+        "counter": { "type": "number", "description": "Message monotonic sequence counter" },
+        "epoch": { "type": "number", "description": "Ratchet/Group Key epoch" },
+        "text": { "type": "string", "maxLength": 500000, "description": "Ciphertext wire payload or status message" },
+        "type": { "type": "string", "enum": ["text", "image", "video", "audio", "voice", "document", "location", "system"], "description": "Message content type" },
+        "attachments": { "type": "array", "description": "List of media attachment metadata objects" },
+        "encryptedMedia": { "type": "object", "description": "Encrypted media payload descriptor" },
+        "status": { "type": "string", "enum": ["sending", "sent", "delivered", "read", "failed"], "description": "Delivery & read state" },
+        "timestamp": { "type": "number", "description": "Creation timestamp in epoch ms" },
+        "editedAt": { "type": "number", "description": "Timestamp of last text edit" },
+        "isDeleted": { "type": "boolean", "description": "Soft deleted for everyone flag" },
+        "deletedFor": { "type": "array", "description": "UIDs who deleted this message for themselves" },
+        "replyTo": { "type": "object", "description": "Quoted message preview data" },
+        "reactions": { "type": "array", "description": "Array of emoji reaction objects" },
+        "isForwarded": { "type": "boolean", "description": "Forwarded flag" },
+        "isStarred": { "type": "boolean", "description": "Starred flag" },
+        "encrypted": { "type": "boolean", "description": "E2EE payload flag" }
+      },
+      "required": ["id", "chatId", "senderId", "senderName", "type", "timestamp", "status"]
+    },
+    "CallSession": {
+      "title": "CallSession",
+      "description": "WebRTC peer-to-peer signaling handshake document.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique call session ID" },
+        "callerId": { "type": "string", "description": "UID of caller" },
+        "callerName": { "type": "string", "description": "Display name of caller" },
+        "callerUsername": { "type": "string", "description": "Username handle of caller" },
+        "callerAvatar": { "type": "string", "description": "Caller avatar URL" },
+        "callerColor": { "type": "string", "description": "Caller avatar gradient" },
+        "calleeId": { "type": "string", "description": "UID of recipient" },
+        "calleeName": { "type": "string", "description": "Display name of recipient" },
+        "calleeUsername": { "type": "string", "description": "Username handle of recipient" },
+        "calleeAvatar": { "type": "string", "description": "Callee avatar URL" },
+        "calleeColor": { "type": "string", "description": "Callee avatar gradient" },
+        "type": { "type": "string", "enum": ["voice", "video"], "description": "Call stream media type" },
+        "status": { "type": "string", "enum": ["calling", "ringing", "accepted", "connected", "rejected", "ended", "missed", "cancelled", "busy"], "description": "Signaling status" },
+        "offer": { "type": "object", "description": "WebRTC SDP Offer object" },
+        "answer": { "type": "object", "description": "WebRTC SDP Answer object" },
+        "createdAt": { "type": "number", "description": "Timestamp when call initiated" },
+        "updatedAt": { "type": "number", "description": "Timestamp of last status transition" },
+        "endedAt": { "type": "number", "description": "Timestamp when call concluded" },
+        "duration": { "type": "number", "description": "Total connected audio/video duration in seconds" },
+        "chatId": { "type": "string", "description": "Associated chat ID" }
+      },
+      "required": ["id", "callerId", "callerName", "calleeId", "calleeName", "type", "status", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "User account profiles accessible for discovery and contact info."
+    },
+    "/users/{userId}/devices/{deviceId}": {
+      "schema": "DevicePublicRecord",
+      "description": "Public device pre-key and identity key distribution records."
+    },
+    "/users/{userId}/contacts/{contactId}": {
+      "schema": "Contact",
+      "description": "Authenticated user's personal contacts subcollection."
+    },
+    "/chats/{chatId}": {
+      "schema": "Chat",
+      "description": "Direct and group conversation documents."
+    },
+    "/chats/{chatId}/messages/{messageId}": {
+      "schema": "Message",
+      "description": "Messages subcollection within a chat."
+    },
+    "/calls/{callId}": {
+      "schema": "CallSession",
+      "description": "WebRTC signaling session documents for voice and video calling."
+    },
+    "/calls/{callId}/callerCandidates/{candId}": {
+      "schema": "object",
+      "description": "ICE candidates generated by the caller."
+    },
+    "/calls/{callId}/calleeCandidates/{candId}": {
+      "schema": "object",
+      "description": "ICE candidates generated by the callee."
+    }
+  }
+}
